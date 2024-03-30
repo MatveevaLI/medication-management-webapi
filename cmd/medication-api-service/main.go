@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/MatveevaLI/medication-management-webapi/api"
+	"github.com/MatveevaLI/medication-management-webapi/internal/medication"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +23,7 @@ func main() {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 	// request routings
+	medication.AddRoutes(engine)
 	engine.GET("/openapi", api.HandleOpenApi)
 	engine.Run(":" + port)
 }

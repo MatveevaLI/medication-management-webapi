@@ -1,0 +1,4 @@
+internal/medication/README.md
+internal/medication/api_medication_list.go
+internal/medication/model_medication_list_entry.go
+internal/medication/routers.go
