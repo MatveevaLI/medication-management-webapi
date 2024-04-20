@@ -48,7 +48,7 @@ func (this *implMedicationListAPI) CreateMedicationListEntry(ctx *gin.Context) {
 
 		ambulance.MedicationList = append(ambulance.MedicationList, entry)
 
-		entryIndx := slices.IndexFunc(medication.MedicationList, func(medication MedicationListEntry) bool {
+		entryIndx := slices.IndexFunc(ambulance.MedicationList, func(medication MedicationListEntry) bool {
 			return entry.Id == medication.Id
 		})
 
