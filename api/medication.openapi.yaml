@@ -14,6 +14,8 @@ info:
 tags:
   - name: medicationList
     description: Medication List API
+  - name: ambulances
+    description: Ambulance details
 paths:
   "/medication-list/{ambulanceId}/entries":
     get:
@@ -183,6 +185,57 @@ paths:
           description: Item deleted
         "404":
           description: Ambulance or Entry with such ID does not exists
+  "/ambulance":
+    post:
+      tags:
+        - ambulances
+      summary: Saves new ambulance definition
+      operationId: createAmbulance
+      description: Use this method to initialize new ambulance in the system
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ambulance"
+            examples:
+              request-sample:
+                $ref: "#/components/examples/AmbulanceExample"
+        description: Ambulance details to store
+        required: true
+      responses:
+        "200":
+          description: >-
+            Value of stored ambulance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ambulance"
+              examples:
+                updated-response:
+                  $ref: "#/components/examples/AmbulanceExample"
+        "400":
+          description: Missing mandatory properties of input object.
+        "409":
+          description: Entry with the specified id already exists
+  "/ambulance/{ambulanceId}":
+    delete:
+      tags:
+        - ambulances
+      summary: Deletes specific ambulance
+      operationId: deleteAmbulance
+      description: Use this method to delete the specific ambulance from the system.
+      parameters:
+        - in: path
+          name: ambulanceId
+          description: pass the id of the particular ambulance
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Item deleted
+        "404":
+          description: Ambulance with such ID does not exist  
 components:
   schemas:
     MedicationListEntry:
@@ -213,6 +266,27 @@ components:
           description: Expiration date of the medication
       example:
         $ref: "#/components/examples/MedicationListEntryExample"
+    Ambulance:
+      type: object
+      required: [ "id", "name", "roomNumber"]
+      properties:
+        id:
+          type: string
+          example: dentist-warenova
+          description: Unique identifier of the ambulance
+        name:
+          type: string
+          example: Zubná ambulancia Dr. Warenová
+          description: Human readable display name of the ambulance
+        roomNumber:
+          type: string
+          example: 356 - 3.posch
+        medicationList:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicationListEntry'
+      example:
+        $ref: "#/components/examples/AmbulanceExample"
   examples:
     MedicationListEntryExample:
       summary: Example Paracetamol Medication Entry
@@ -239,3 +313,22 @@ components:
           dosage: 200mg
           frequencyPerDay: 4
           expirationDate: "2025-08-15"
+    AmbulanceExample:
+      summary: Sample GP ambulance
+      description: |
+        Example of GP ambulance with medication list
+      value:
+        id: gp-warenova
+        name: Ambulancia všeobecného lekárstva Dr. Warenová
+        roomNumber: 356 - 3.posch
+        medicationList:
+          - id: med12345
+            name: Paracetamol
+            dosage: 500mg
+            frequencyPerDay: 3
+            expirationDate: "2024-05-01"
+          - id: med67890
+            name: Ibuprofen
+            dosage: 200mg
+            frequencyPerDay: 4
+            expirationDate: "2025-08-15"
