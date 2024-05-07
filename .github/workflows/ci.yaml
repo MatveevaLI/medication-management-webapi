@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: Test and Publish WebAPi Container Image
 
 on:
@@ -10,8 +7,8 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:  {} # allow manually trigger workflow
-jobs:
 
+jobs:
   build:
     runs-on: ubuntu-latest
     steps:
@@ -21,20 +18,20 @@ jobs:
       id: get_go_version
       run: echo "go_version=$(grep -m1 'go ' go.mod | awk '{print $2}')" >> $GITHUB_OUTPUT
       
+    - name: Generate api controllers interfaces
+      uses: craicoverflow/openapi-generator-generate-action@v1.2.1
+      with:
+        version: 7.4.0
+        generator: go-gin-server
+        input: api/medication.openapi.yaml
+        additional-properties: apiPath=internal/medication,packageName=medication
+        template: scripts/templates
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: ${{ steps.get_go_version.outputs.go_version }}
         
-    - name: Generate api controllers interfaces
-      uses: craicoverflow/openapi-generator-generate-action@v1.2.1
-      with:
-        # version: 7.0.0-beta - at time of writing this text only prerelease was available
-        generator: go-gin-server
-        input: api/medication.openapi.yaml
-        additional-properties: apiPath=internal/medication,packageName=medication
-        template: scripts/templates
-    
     - name: Build
       run: go build -v ./cmd/medication-api-service
 

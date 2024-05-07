@@ -5,62 +5,20 @@ metadata:
 spec:
   replicas: 1
   selector:
-      matchLabels:
-        pod: matveeva-medication-management-webapi-label
+    matchLabels:
+      pod: matveeva-medication-management-webapi-label
   template:
-      metadata:
-        labels:
-          pod: matveeva-medication-management-webapi-label
-      spec:
-        volumes:
-        - name: init-scripts
-          configMap:
-            name: matveeva-medication-management-webapi-mongodb-init
-        initContainers:
-        - name: init-mongodb
-          image: mongo:latest
-          imagePullPolicy: Always
-          command: ['mongosh', "--nodb", '-f', '/scripts/init-db.js']
-          volumeMounts:
-          - name: init-scripts
-            mountPath: /scripts
-          env:
-             - name: AMBULANCE_API_PORT
-               value: "8080"
-             - name: AMBULANCE_API_MONGODB_HOST
-               value: mongodb
-             - name: AMBULANCE_API_MONGODB_PORT
-               value: "27017"
-             - name: AMBULANCE_API_MONGODB_USERNAME
-               value: ""
-             - name: AMBULANCE_API_MONGODB_PASSWORD
-               value: ""
-             - name: AMBULANCE_API_MONGODB_DATABASE
-               valueFrom:
-                 configMapKeyRef:
-                   name: matveeva-medication-management-webapi-config
-                   key: database
-             - name: AMBULANCE_API_MONGODB_COLLECTION
-               valueFrom:
-                 configMapKeyRef:
-                   name: matveeva-medication-management-webapi-config
-                   key: collection
-             - name: RETRY_CONNECTION_SECONDS
-               value: "5"
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "0.01"
-            limits:
-              memory: "256Mi"
-              cpu: "0.1"
-        containers:
+    metadata:
+      labels:
+        pod: matveeva-medication-management-webapi-label
+    spec:
+      containers:
         - name: matveeva-medication-management-webapi-container
           image: matveevali/medication-management-webapi:latest
           imagePullPolicy: Always
           ports:
-          - name: webapi-port
-            containerPort: 8080
+            - name: webapi-port
+              containerPort: 8080
           env:
             - name: AMBULANCE_API_ENVIRONMENT
               value: production
@@ -99,12 +57,12 @@ spec:
           image: swaggerapi/swagger-ui
           imagePullPolicy: Always
           ports:
-          - name: api-ui
-            containerPort: 8081
+            - name: api-ui
+              containerPort: 8081
           env:
             - name: PORT
               value: "8081"
-            - name:   URL
+            - name: URL
               value: /openapi
             - name: BASE_URL
               value: /openapi-ui
@@ -113,9 +71,51 @@ spec:
             - name: DISPLAY_OPERATION_ID
               value: 'true'
           resources:
-              requests:
-                  memory: "16M"
-                  cpu: "0.01"
-              limits:
-                  memory: "64M"
-                  cpu: "0.1"
+            requests:
+              memory: "16M"
+              cpu: "0.01"
+            limits:
+              memory: "64M"
+              cpu: "0.1"
+      volumes:
+        - name: init-scripts
+          configMap:
+            name: matveeva-medication-management-webapi-mongodb-init
+      initContainers:
+        - name: init-mongodb
+          image: mongo:latest
+          imagePullPolicy: Always
+          command: ['mongosh', "--nodb", '-f', '/scripts/init-db.js']
+          volumeMounts:
+            - name: init-scripts
+              mountPath: /scripts
+          env:
+            - name: AMBULANCE_API_PORT
+              value: "8080"
+            - name: AMBULANCE_API_MONGODB_HOST
+              value: mongodb
+            - name: AMBULANCE_API_MONGODB_PORT
+              value: "27017"
+            - name: AMBULANCE_API_MONGODB_USERNAME
+              value: ""
+            - name: AMBULANCE_API_MONGODB_PASSWORD
+              value: ""
+            - name: AMBULANCE_API_MONGODB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: matveeva-medication-management-webapi-config
+                  key: database
+            - name: AMBULANCE_API_MONGODB_COLLECTION
+              valueFrom:
+                configMapKeyRef:
+                  name: matveeva-medication-management-webapi-config
+                  key: collection
+            - name: RETRY_CONNECTION_SECONDS
+              value: "5"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "0.01"
+            limits:
+              memory: "256Mi"
+              cpu: "0.1"
